@@ -11,58 +11,64 @@ spec:
       storage: 5Gi
 status: {}
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: cast-db-service
-  labels:
-    app: cast-db-service
-spec:
-  type: ClusterIP
-  ports:
-    - port: 5432
-      targetPort: 5432
-  selector:
-    app: cast-db
----
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: cast-db
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: cast-db
-  replicas: 1
   template:
     metadata:
       labels:
         app: cast-db
     spec:
       containers:
-      - name: cast-db
-        image: postgres:12.1-alpine
-        ports:
-        - containerPort: 5432
-        volumeMounts:
-        - name: postgres-data-cast
-          mountPath: /var/lib/postgresql/data
-        env:
-          - name: POSTGRES_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: postgres-secret-cast
-                key: POSTGRES_PASSWORD
-          - name: POSTGRES_USER
-            value: datascientest
-          - name: POSTGRES_DB
-            value: datascientest
-  volumeClaimTemplates:
-  - metadata:
-      name: postgres-data-cast
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      storageClassName: "local-path"
-      resources:
-        requests:
-          storage: 5Gi
+        - name: cast-db
+          image: postgres:12.1-alpine
+          imagePullPolicy: "IfNotPresent"
+          ports:
+          - containerPort: 5432
+          env:
+            - name: POSTGRES_PASSWORD
+              value: cast_db_password
+            - name: POSTGRES_USER
+              value: datascientest
+            - name: POSTGRES_DB
+              value: datascientest        
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data/
+              name: postgres-data-movie
+      volumes:
+        - name: postgres-data-movie
+          persistentVolumeClaim:
+            claimName: postgres-data-movie  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cast-db
+  labels:
+    app: cast-db
+spec:
+  type: NodePort
+  ports:
+    - name: cast-db
+      port: 5432
+      targetPort: 5432
+  selector:
+    app: cast-db
+---
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#  name: postgres-secret-cast
+#  namespace: standard
+#type: Opaque
+#data:
+#  postgres-username: YWRtaW4=
+#  postgres-password: cGFzc3dvcmQ=
+#  postgres-database: c3RvcmVkYg==
+#---

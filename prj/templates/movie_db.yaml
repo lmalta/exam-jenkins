@@ -1,39 +1,3 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: movie-db
-spec:
-  selector:
-    matchLabels:
-      app: movie-db
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        app: movie-db
-    spec:
-      containers:
-      - env:
-        - name: POSTGRES_DB
-          value: movie_db_dev
-        - name: POSTGRES_PASSWORD
-          value: movie_db_password
-        - name: POSTGRES_USER
-          value: movie_db_username
-        image: postgres:12.1-alpine
-        imagePullPolicy: ""
-        name: movie-db
-        resources: {}
-        volumeMounts:
-        - mountPath: /var/lib/postgresql/data/
-          name: postgres-data-movie
-      restartPolicy: Always
-      serviceAccountName: ""
-      volumes:
-      - name: postgres-data-movie
-        persistentVolumeClaim:
-          claimName: postgres-data-movie
----
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -48,3 +12,39 @@ spec:
     requests:
       storage: 100Mi
 status: {}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: movie-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: movie-db
+  template:
+    metadata:
+      labels:
+        app: movie-db
+    spec:
+      containers:
+        - name: movie-db
+          image: postgres:12.1-alpine
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: movie_db_dev
+            - name: POSTGRES_PASSWORD
+              value: movie_db_password
+            - name: POSTGRES_USER
+              value: movie_db_username
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data/
+              name: postgres-data-movie
+      volumes:
+        - name: postgres-data-movie
+          persistentVolumeClaim:
+            claimName: postgres-data-movie
+---

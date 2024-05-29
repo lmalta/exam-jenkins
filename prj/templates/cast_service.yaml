@@ -36,8 +36,8 @@ spec:
         env:
         - name: DATABASE_URI
           value: postgresql://cast_db_username:cast_db_password@cast_db/cast_db_dev
-        image: lmalta/cast-service:v2
-        imagePullPolicy: "IfNotPresent"
+        image: lmalta3/cast-service:v2
+        imagePullPolicy: "Always"
         name: cast-service
         ports:
         - containerPort: 8000

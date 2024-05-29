@@ -1,0 +1,77 @@
+     sudo helm upgrade --install app prj/ \
+      --values=prj/values.yaml \
+      --namespace $NAMESPACE \
+      --set gateway.image.repository=$GATEWAY_IMAGE \
+      --set gateway.image.tag=$CI_COMMIT_SHORT_SHA \
+      --set gateway.service.nodeport=$NODEPORT \
+      
+      
+      
+      sudo helm upgrade --install app helm/ 
+      --values=helm/values.yaml 
+      --namespace dev 
+      --set movie_service.image.repository=jenkins-exam-movie_service 
+      --set movie_service.image.tag=v.27.0 
+      --set cast_service.image.repository=jenkins-exam-cast_service 
+      --set cast_service.image.tag=v.27.0
+      
+sudo helm upgrade --install app helm/ 
+                  --values=helm/values.yaml 
+                  --namespace dev 
+                  --set movie_service.image.repository=jenkins-exam-movie_service 
+                  --set movie_service.image.tag=v.27.0 
+                  --set cast_service.image.repository=jenkins-exam-cast_service 
+                  --set cast_service.image.tag=v.27.0
+
+      
+sudo helm upgrade --install app prj/ --values=prj/values.yaml
+      
+ helm uninstall app 
+  
+ kubectl get all       
+ 
+ 
+   Type     Reason     Age                   From               Message
+  ----     ------     ----                  ----               -------
+  Normal   Scheduled  2m51s                 default-scheduler  Successfully assigned default/nginx-78c9fbd866-qflgl to ip-172-31-11-125
+  Normal   Pulled     2m50s                 kubelet            Successfully pulled image "nginx:latest" in 625ms (625ms including waiting)
+  Normal   Pulled     2m48s                 kubelet            Successfully pulled image "nginx:latest" in 745ms (745ms including waiting)
+  Normal   Pulled     2m31s                 kubelet            Successfully pulled image "nginx:latest" in 607ms (607ms including waiting)
+  Normal   Pulled     2m8s                  kubelet            Successfully pulled image "nginx:latest" in 594ms (594ms including waiting)
+  Normal   Created    2m8s (x4 over 2m50s)  kubelet            Created container nginx
+  Warning  Failed     2m8s (x4 over 2m50s)  kubelet            Error: failed to create containerd task: failed to create shim task: OCI runtime create failed: 
+  runc create failed: unable to start container process: error during container init: error mounting 
+  "/var/lib/kubelet/pods/aba9a349-5d2b-4981-a534-609ba3d55427/volumes/kubernetes.io~local-volume/pvc-4dc311d7-0eb4-420a-9343-05cc8e74940f" 
+  to rootfs at "/etc/nginx/conf.d/default.conf": 
+  mount /var/lib/kubelet/pods/aba9a349-5d2b-4981-a534-609ba3d55427/volumes/kubernetes.io~local-volume/pvc-4dc311d7-0eb4-420a-9343-05cc8e74940f:
+  /etc/nginx/conf.d/default.conf (via /proc/self/fd/6), flags: 0x5000: not a directory: unknown
+  Warning  BackOff    92s (x8 over 2m47s)   kubelet            Back-off restarting failed container nginx in pod nginx-78c9fbd866-qflgl_default(aba9a349-5d2b-4981-a534-609ba3d55427)
+  Normal   Pulling    77s (x5 over 2m51s)   kubelet            Pulling image "nginx:latest"
+  
+  
+                 
+NAME                                 READY   STATUS                       RESTARTS   AGE
+pod/cast-db-0                        0/1     CreateContainerConfigError   0          12s
+pod/nginx-78c9fbd866-gbf8v           0/1     ContainerCreating            0          12s
+pod/movie-db-7c698ddcc-wk7zg         1/1     Running                      0          12s
+pod/movie-service-7bfc4c8485-lpvds   0/1     ContainerCreating            0          12s
+pod/cast-service-5799b45fb8-9w8tv    0/1     ContainerCreating            0          12s
+
+NAME                      TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+service/kubernetes        ClusterIP   10.43.0.1       <none>        443/TCP    28m
+service/nginx             ClusterIP   10.43.202.95    <none>        8080/TCP   12s
+service/cast-service      ClusterIP   10.43.157.242   <none>        8002/TCP   12s
+service/movie-service     ClusterIP   10.43.197.211   <none>        8001/TCP   12s
+service/cast-db-service   ClusterIP   10.43.106.15    <none>        5432/TCP   12s
+
+NAME                            READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/nginx           0/1     1            0           12s
+deployment.apps/movie-service   0/1     1            0           12s
+deployment.apps/cast-service    0/1     1            0           12s
+deployment.apps/movie-db        1/1     1            1           12s
+
+NAME                                       DESIRED   CURRENT   READY   AGE
+replicaset.apps/nginx-78c9fbd866           1         1         0       12s
+replicaset.apps/movie-service-7bfc4c8485   1         1         0       12s
+replicaset.apps/cast-service-5799b45fb8    1         1         0       12s
+replicaset.apps/movie-db-7c698ddcc         1         1         1       12s

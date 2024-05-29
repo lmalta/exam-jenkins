@@ -1,0 +1,81 @@
+
+sudo helm upgrade --install app prj/ --values=prj/values.yaml
+
+ helm uninstall app
+
+ kubectl get all
+
+sudo ssh -i "PATH_TO_FILE/data_enginering_machine.pem" ubuntu@34.245.6.35
+git clone https://github.com/lmalta/exam-jenkins.git
+git@github.com:lmalta/exam-jenkins.git
+
+http://34.245.6.35:8080/env-vars.html
+34.245.6.35
+http://34.245.6.35:8080/
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+
+
+docker push lmalta3/jenkins-nginx:tagname
+docker push lmalta3/jenkins-movie:tagname
+docker push lmalta3/jenkins-cast:tagname
+
+
+
+https://github.com/DataScientest/Jenkins_devops_exams.git
+git@github.com:lmalta/Jenkins-datascientest.git
+
+…or create a new repository on the command line
+echo "# exam-jenkins" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin git@github.com:lmalta/exam-jenkins.git
+git push -u origin main
+…or push an existing repository from the command line
+git remote add origin git@github.com:lmalta/exam-jenkins.git
+git branch -M main
+git push -u origin main
+
+kubectl delete deployment --all --namespace=prod
+kubectl delete deployment --all --namespace=staging
+kubectl delete deployment --all --namespace=dev
+kubectl delete service --all --namespace=prod
+kubectl delete service --all --namespace=staging
+
+
+
+
+
+git clone https://github.com/lmalta/Jenkins-datascientest.git
+
+git clone https://github.com/DataScientest/Jenkins_devops_exams.git
+cd Jenkins_devops_exams/
+rm -rf .git
+
+
+
+Make sure you have installed docker and docker-compose
+Run docker-compose up -d
+Head over to http://3.254.198.42:8080/api/v1/movies/docs for movie service docs
+and http://3.254.198.42:8080/api/v1/casts/docs for cast service docs
+
+
+http://34.245.6.35:8080/env-vars.html
+34.245.6.35
+http://34.245.6.35:8080/
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+
+username:admin
+password:adminpwd
+fullname:louis
+email:louis.malta@gmail.com
+
+jenkins URL: http://34.245.6.35:8080/
+http://34.245.6.35:8080/
+
+github repo (public)
+https://github.com/lmalta/Jenkins-datascientest
+Jenkinsfile
+
+

@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cast-service
+spec:
+  ports:
+  - name: "8002"
+    port: 8002
+    targetPort: 8000
+status:
+  loadBalancer: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cast-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cast-service
+  template:
+    metadata:
+      labels:
+        app: cast-service
+    spec:
+      containers:
+      - args:
+        - uvicorn
+        - app.main:app
+        - --reload
+        - --host
+        - 0.0.0.0
+        - --port
+        - "8000"
+        env:
+        - name: DATABASE_URI
+          value: postgresql://cast_db_username:cast_db_password@cast_db/cast_db_dev
+        image: cast-service:v1
+        imagePullPolicy: ""
+        name: cast-service
+        ports:
+        - containerPort: 8000
+        resources: {}
+        volumeMounts:
+        - mountPath: /app/
+          name: cast-service-claim0
+      restartPolicy: Always
+      serviceAccountName: ""
+      volumes:
+      - name: cast-service-claim0
+        persistentVolumeClaim:
+          claimName: cast-service-claim0
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: cast-service-claim0
+  name: cast-service-claim0
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi

@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+  name: movie-service
+spec:
+  ports:
+  - name: "8001"
+    port: 8001
+    targetPort: 8000
+  selector:
+    io.kompose.service: movie-service
+status:
+  loadBalancer: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movie-service
+spec:
+  selector:
+    matchLabels:
+      app: movie-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: movie-service
+    spec:
+      containers:
+      - args:
+        - uvicorn
+        - app.main:app
+        - --reload
+        - --host
+        - 0.0.0.0
+        - --port
+        - "8000"
+        env:
+        - name: CAST_SERVICE_HOST_URL
+          value: http://cast_service:8000/api/v1/casts/
+        - name: DATABASE_URI
+          value: postgresql://movie_db_username:movie_db_password@movie_db/movie_db_dev
+        image: movie-service
+        imagePullPolicy: ""
+        name: movie-service:v1
+        ports:
+        - containerPort: 8000
+        volumeMounts:
+        - mountPath: /app/
+          name: movie-service-claim0
+      restartPolicy: Always
+      serviceAccountName: ""
+      volumes:
+      - name: movie-service-claim0
+        persistentVolumeClaim:
+          claimName: movie-service-claim0
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: movie-service-claim0
+  name: movie-service-claim0
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+---

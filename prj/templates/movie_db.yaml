@@ -16,35 +16,50 @@ status: {}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: movie-db
+  name: {{ .Values.moviedb.app }} 
 spec:
-  replicas: 1
+  replicas: {{ .Values.moviedb.replicas }}
   selector:
     matchLabels:
-      app: movie-db
+      app: {{ .Values.moviedb.app }} 
   template:
     metadata:
       labels:
-        app: movie-db
+        app: {{ .Values.moviedb.app }} 
     spec:
       containers:
-        - name: movie-db
-          image: postgres:12.1-alpine
+        - name: {{ .Values.moviedb.app }} 
+          image: {{ .Values.moviedb.image }} 
           imagePullPolicy: "IfNotPresent"
           ports:
-            - containerPort: 5432
+            - containerPort: {{ .Values.moviedb.containerPort }} 
           env:
             - name: POSTGRES_DB
-              value: movie_db_dev
+              value: {{ .Values.moviedb.env.POSTGRES_DB }} 
             - name: POSTGRES_PASSWORD
-              value: movie_db_password
+              value: {{ .Values.moviedb.env.POSTGRES_PASSWORD }} 
             - name: POSTGRES_USER
-              value: movie_db_username
+              value: {{ .Values.moviedb.env.POSTGRES_USER }} 
           volumeMounts:
             - mountPath: /var/lib/postgresql/data/
               name: postgres-data-movie
       volumes:
         - name: postgres-data-movie
           persistentVolumeClaim:
-            claimName: postgres-data-movie
+            claimName: postgres-data-movie 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.moviedb.name }}
+  labels:
+    app: {{ .Values.moviedb.name }}
+spec:
+  type: NodePort
+  ports:
+    - name: {{ .Values.castdb.name }}
+      port: {{ .Values.moviedb.service.port }}
+      targetPort: {{ .Values.moviedb.service.targetPort }}
+  selector:
+    app: {{ .Values.moviedb.name }}
 ---

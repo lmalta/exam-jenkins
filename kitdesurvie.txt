@@ -1,17 +1,22 @@
 
-sudo helm upgrade --install app prj/ --values=prj/values.yaml
+sudo 
+helm upgrade --install app prj/ --values=prj/values.yaml
 
  helm uninstall app
 
  kubectl get all
 
-sudo ssh -i "PATH_TO_FILE/data_enginering_machine.pem" ubuntu@34.245.6.35
+curl -i http://localhost:8082/api/v1/movies/docs
+
+curl -i http://localhost:8081/api/v1/movies/docs
+
+sudo ssh -i "PATH_TO_FILE/data_enginering_machine.pem" ubuntu@18.201.236.199
 git clone https://github.com/lmalta/exam-jenkins.git
 git@github.com:lmalta/exam-jenkins.git
 
-http://34.245.6.35:8080/env-vars.html
-34.245.6.35
-http://34.245.6.35:8080/
+http://18.201.236.199:8080/env-vars.html
+18.201.236.199
+http://18.201.236.199:8080/
 sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 
 
@@ -42,6 +47,15 @@ kubectl delete deployment --all --namespace=staging
 kubectl delete deployment --all --namespace=dev
 kubectl delete service --all --namespace=prod
 kubectl delete service --all --namespace=staging
+
+
+NAME                    TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+service/kubernetes      ClusterIP   10.43.0.1       <none>        443/TCP          414d
+service/nginx           ClusterIP   10.43.111.90    <none>        8082/TCP         5s
+service/cast-service    ClusterIP   10.43.192.203   <none>        8002/TCP         5s
+service/cast-db         NodePort    10.43.239.36    <none>        5432:31294/TCP   5s
+service/movie-service   ClusterIP   10.43.193.243   <none>        8001/TCP         5s
+
 
 
 
@@ -78,4 +92,35 @@ github repo (public)
 https://github.com/lmalta/Jenkins-datascientest
 Jenkinsfile
 
+Error: failed to create containerd task: failed to create shim task: OCI runtime create failed: runc create failed: 
+unable to start container process: error during container init: error mounting 
+"/var/lib/kubelet/pods/65a540d5-ae0f-4bd9-9a2b-eb96fbb24f5e/volumes/kubernetes.io~local-volume/
+pvc-2c37cd41-da35-4164-af16-79a3cdb1b2e8" to rootfs at "/etc/nginx/conf.d/default.conf": 
+mount 
+/var/lib/kubelet/pods/65a540d5-ae0f-4bd9-9a2b-eb96fbb24f5e/volumes/kubernetes.io~local-volume/pvc-2c37cd41-da35-4164-af16-79a3cdb1b2e8:/etc/nginx/conf.d/default.conf 
+(via /proc/self/fd/6), flags: 0x5000: not a directory: unknown
+  Warning  BackOff    5s (x4 over 32s)   kubelet            Back-off restarting failed container nginx in pod nginx-78c9fbd866-x8srt_default(65a540d5-ae0f-4bd9-9a2b-eb96fbb24f5e)
+  
+  
+  
+  Error: failed to create containerd task: failed to create shim task: OCI runtime create failed: 
+  runc create failed: unable to start container process: error during container init: error mounting
+   "/var/lib/kubelet/pods/a6760f74-24fa-46c8-a1ed-f177ebcd0ebb/volumes/kubernetes.io~local-volume/pvc-4043f8f2-4ef9-4fc6-b03e-8b089561d290"
+   to rootfs at "/etc/nginx/conf.d/default.conf": 
+   mount /var/lib/kubelet/pods/a6760f74-24fa-46c8-a1ed-f177ebcd0ebb/volumes/kubernetes.io~local-volume/pvc-4043f8f2-4ef9-4fc6-b03e-8b089561d290:
+   /etc/nginx/conf.d/default.conf (via /proc/self/fd/6), flags: 0x5000: not a directory: unknown
+  Warning  BackOff    1s (x4 over 29s)   kubelet            Back-off restarting failed container nginx in pod nginx-5969fc4c54-59d8r_default(a6760f74-24fa-46c8-a1ed-f177ebcd0ebb)
+ubuntu@ip-172-31-11-125:~/exam-jenkins$ 
 
+
+Error: failed to create containerd task: failed to create shim task: OCI runtime create failed:
+ runc create failed: unable to start container process: error during container init: error mounting
+  "/var/lib/kubelet/pods/d33c163e-f3c5-4fbe-9a81-2b98ddd6bf3b/volumes/kubernetes.io~local-volume/pvc-ff4ef64f-1673-4419-a5db-8c5317e92349" to rootfs at 
+  "/etc/nginx/conf.d/default.conf": mount /var/lib/kubelet/pods/d33c163e-f3c5-4fbe-9a81-2b98ddd6bf3b/volumes/kubernetes.io~local-volume/pvc-ff4ef64f-1673-4419-a5db-8c5317e92349:
+  /etc/nginx/conf.d/default.conf (via /proc/self/fd/6), flags: 0x5000: not a directory: unknown
+  Warning  BackOff    2s (x3 over 20s)  kubelet            Back-off restarting failed container nginx in pod nginx-796c448c88-rt8r6_default(d33c163e-f3c5-4fbe-9a81-2b98ddd6bf3b)
+ubuntu@ip-172-31-11-125:~/exam-jenkins$ 
+
+
+
+  

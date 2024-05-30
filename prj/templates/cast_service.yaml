@@ -1,28 +1,28 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: cast-service
+  name: {{ .Values.cast.name }}-service
 spec:
   ports:
-  - name: "8002"
-    port: 8002
-    targetPort: 8000
+  - name: "{{ .Values.cast.ports.name }}"
+    port: {{ .Values.cast.ports.port }}
+    targetPort: {{ .Values.cast.ports.targetPort }}
 status:
   loadBalancer: {}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cast-service
+  name: {{ .Values.cast.name }}-service
 spec:
-  replicas: 1
+  replicas: {{ .Values.cast.replicas }}
   selector:
     matchLabels:
-      app: cast-service
+      app: {{ .Values.cast.name }}-service
   template:
     metadata:
       labels:
-        app: cast-service
+        app: {{ .Values.cast.name }}-service
     spec:
       containers:
       - args:
@@ -35,30 +35,29 @@ spec:
         - "8000"
         env:
         - name: DATABASE_URI
-          value: postgresql://cast_db_username:cast_db_password@cast_db/cast_db_dev
-        image: lmalta3/cast-service:v2
+          value: {{ .Values.cast.containers.env.DATABASE_URI  }}
+        image: "{{ .Values.cast.image.repository }}:{{ .Values.cast.image.tag }}"  
         imagePullPolicy: "Always"
-        name: cast-service
+        name: {{ .Values.cast.name }}-service
         ports:
-        - containerPort: 8000
+        - containerPort: {{ .Values.cast.containers.ports.containerPort }}
         resources: {}
         volumeMounts:
-        - mountPath: /app/
-          name: cast-service-claim0
+        - mountPath:  {{ .Values.cast.containers.volumeMounts.mountPath }}
+          name: {{ .Values.cast.containers.volumeMounts.name }}
       restartPolicy: Always
       serviceAccountName: ""
       volumes:
-      - name: cast-service-claim0
+      - name: {{ .Values.cast.containers.volumeMounts.name }}
         persistentVolumeClaim:
-          claimName: cast-service-claim0
+          claimName: {{ .Values.cast.containers.volumeMounts.name }}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   creationTimestamp: null
   labels:
-    io.kompose.service: cast-service-claim0
-  name: cast-service-claim0
+  name: {{ .Values.cast.containers.volumeMounts.name }}
 spec:
   accessModes:
   - ReadWriteOnce

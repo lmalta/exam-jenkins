@@ -5,61 +5,61 @@ metadata:
   name: postgres-data-cast
 spec:
   accessModes:
-  - ReadWriteOnce
+  - {{ .Values.castdb.pvc.accessModes }}
   resources:
     requests:
-      storage: 5Gi
+      storage: {{ .Values.castdb.pvc.storage }}
 status: {}
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: cast-db
+  name: {{ .Values.castdb.name }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: cast-db
+      app: {{ .Values.castdb.name }}
   template:
     metadata:
       labels:
-        app: cast-db
+        app: {{ .Values.castdb.name }}
     spec:
       containers:
-        - name: cast-db
+        - name: {{ .Values.castdb.name }}
           image: postgres:12.1-alpine
           imagePullPolicy: "IfNotPresent"
           ports:
-          - containerPort: 5432
+          - containerPort: {{ .Values.castdb.service.port }}
           env:
             - name: POSTGRES_PASSWORD
-              value: cast_db_password
+              value: {{ .Values.castdb.env.POSTGRES_PASSWORD }}
             - name: POSTGRES_USER
-              value: datascientest
+              value: {{ .Values.castdb.env.POSTGRES_USER }}
             - name: POSTGRES_DB
-              value: datascientest        
+              value: {{ .Values.castdb.env.POSTGRES_DB }}        
           volumeMounts:
-            - mountPath: /var/lib/postgresql/data/
-              name: postgres-data-movie
+            - mountPath: {{ .Values.castdb.volumeMounts.mountPath }}   
+              name: {{ .Values.castdb.volumeMounts.name }}  
       volumes:
-        - name: postgres-data-movie
+        - name: {{ .Values.castdb.volumes.name }} 
           persistentVolumeClaim:
-            claimName: postgres-data-movie  
+            claimName: {{ .Values.castdb.volumes.persistentVolumeClaim.claimName }}  
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: cast-db
+  name: {{ .Values.castdb.name }}
   labels:
-    app: cast-db
+    app: {{ .Values.castdb.name }}
 spec:
   type: NodePort
   ports:
-    - name: cast-db
-      port: 5432
-      targetPort: 5432
+    - name: {{ .Values.castdb.name }}
+      port: {{ .Values.castdb.service.port }}
+      targetPort: {{ .Values.castdb.service.targetPort }}
   selector:
-    app: cast-db
+    app: {{ .Values.castdb.name }}
 ---
 # apiVersion: v1
 # kind: Secret

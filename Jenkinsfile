@@ -1,79 +1,24 @@
 pipeline {
-    environment { // Declaration of environment variables
-    DOCKER_ID = "lmalta3" // replace this with your docker-id
-    DOCKER_IMAGE_CAST = "cast-service"
-    DOCKER_IMAGE_MOVIE = "movie-service"
-    DOCKER_TAG = "v.${BUILD_ID}.0" // we will tag our images with the current build in order to increment the value by 1 with each new build
+environment { // Declaration of environment variables
+DOCKER_ID = "lmalta3" // replace this with your docker-id
+DOCKER_IMAGE_CAST = "cast-service"
+DOCKER_IMAGE_MOVIE = "movie-service"
+DOCKER_TAG = "v.${BUILD_ID}.0" // we will tag our images with the current build in order to increment the value by 1 with each new build
 }
 agent any // Jenkins will be able to select all available agents
-
 stages {
-        stage('Remove Jenkins Docker'){ // docker build image stage
+        stage(' Docker Build'){ // docker build image stage
             steps {
                 script {
-                         sh '''
-                         docker rm -f jenkins
-                         sleep 6
-                         '''
+                sh '''
+                 docker rm -f jenkins
+                 docker build -t $DOCKER_ID/$DOCKER_IMAGE_CAST:$DOCKER_TAG cast-service/
+                 docker build -t $DOCKER_ID/$DOCKER_IMAGE_MOVIE:$DOCKER_TAG movie-service/
+                sleep 6
+                '''
                 }
             }
         }
-        stage('Build Docker Image') {
-            parallel {
-                stage {
-                    stage('Build Cast-Service') { // docker build image 
-                         steps {
-                         script {
-                                 sh '''
-                                 docker build -t $DOCKER_ID/$DOCKER_IMAGE_CAST:$DOCKER_TAG cast-service/
-                                 '''
-                             }
-                         }
-                    }
-                    stage('Push Cast-Service') { // Push docker image stage
-                        environment
-                        {
-                            DOCKER_PASS = credentials("DOCKER_HUB_PASS") // we retrieve  docker password from secret text called docker_hub_pass saved on jenkins
-                        }
-                        steps {
-
-                            script {
-                            sh '''
-                            docker login -u $DOCKER_ID -p $DOCKER_PASS
-                            docker push $DOCKER_ID/$DOCKER_IMAGE_CAST:$DOCKER_TAG
-                            '''
-                            }
-                        }
-                    }
-                }
-                stage {
-                    stage('Build movie-service') { // docker build image stage
-                         steps {
-                             script {
-                                 sh '''
-                                 docker build -t $DOCKER_ID/$DOCKER_IMAGE_MOVIE:$DOCKER_TAG movie-service/
-                                 '''
-                             }
-                         }
-                    }
-                    stage('Push movie-service') { // Push image stage
-                        environment
-                        {
-                            DOCKER_PASS = credentials("DOCKER_HUB_PASS") // we retrieve  docker password from secret text called docker_hub_pass saved on jenkins
-                        }
-                        steps {
-                            script {
-                            sh '''
-                            docker login -u $DOCKER_ID -p $DOCKER_PASS
-                            docker push $DOCKER_ID/$DOCKER_IMAGE_MOVIE:$DOCKER_TAG
-                            '''
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
 //        stage('Docker run'){ // run container from our builded image
 //                steps {
 //                    script {
@@ -96,88 +41,109 @@ stages {
             }
 
         }
-        stage('Deploiement en dev'){
-                environment
-                {
-                KUBECONFIG = credentials("config") // we retrieve  kubeconfig from secret file called config saved on jenkins
-                }
-                    steps {
-                        script {
-                        sh '''
-                        rm -Rf .kube
-                        mkdir .kube
-                        ls
-                        cat $KUBECONFIG > .kube/config
-           //             cp fastapi/values.yaml values.yml
-           //             cat values.yml
-                        sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" prj/values.yml
-                        helm upgrade --install app prj/ --values=prj/values.yaml --namespace dev
-                        '''
-                        }
-                    }
-
-                }
-        stage('Deploiement en staging'){
-                environment
-                {
-                KUBECONFIG = credentials("config") // we retrieve  kubeconfig from secret file called config saved on jenkins
-                }
-                    steps {
-                        script {
-                        sh '''
-                        rm -Rf .kube
-                        mkdir .kube
-                        ls
-                        cat $KUBECONFIG > .kube/config
-                        sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" prj/values.yml
-                        helm upgrade --install app prj/ --values=prj/values.yaml --namespace staging
-                        '''
-                        }
-                    }
-
-                }
-        stage('Deploiement en QA'){
+        stage('Docker Push'){ //we pass the built image to our docker hub account
             environment
             {
-                KUBECONFIG = credentials("config") // we retrieve  kubeconfig from secret file called config saved on jenkins
+                DOCKER_PASS = credentials("DOCKER_HUB_PASS") // we retrieve  docker password from secret text called docker_hub_pass saved on jenkins
             }
+
             steps {
+
                 script {
-                     sh '''
-                     rm -Rf .kube
-                     mkdir .kube
-                     ls
-                     cat $KUBECONFIG > .kube/config
-                     sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" prj/values.yml
-                     helm upgrade --install app prj/ --values=prj/values.yaml --namespace qa
-                     '''
-                }
-            }
-        }
-        stage('Deploiement en prod'){
-            environment
-            {
-                KUBECONFIG = credentials("config") // we retrieve  kubeconfig from secret file called config saved on jenkins
-            }
-            steps {
-                // Create an Approval Button with a timeout of 15minutes.
-                // this require a manuel validation in order to deploy on production environment
-                timeout(time: 15, unit: "MINUTES") {
-                    input message: 'Do you want to deploy in production ?', ok: 'Yes'
-                }
-                script {
-                    sh '''
-                    rm -Rf .kube
-                    mkdir .kube
-                    ls
-                    cat $KUBECONFIG > .kube/config
-                    sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" prj/values.yml
-                    helm upgrade --install app prj/ --values=prj/values.yaml --namespace staging
-                    '''
+                sh '''
+                docker login -u $DOCKER_ID -p $DOCKER_PASS
+                docker push $DOCKER_ID/$DOCKER_IMAGE_CAST:$DOCKER_TAG
+                docker push $DOCKER_ID/$DOCKER_IMAGE_MOVIE:$DOCKER_TAG
+                '''
                 }
             }
 
         }
 
-    }
+stage('Deploiement en dev'){
+        environment
+        {
+        KUBECONFIG = credentials("config") // we retrieve  kubeconfig from secret file called config saved on jenkins
+        }
+            steps {
+                script {
+                sh '''
+                rm -Rf .kube
+                mkdir .kube
+                ls
+                cat $KUBECONFIG > .kube/config
+   //             cp fastapi/values.yaml values.yml
+   //             cat values.yml
+                sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" prj/values.yml
+                helm upgrade --install app prj/ --values=prj/values.yaml --namespace dev  --set movie.image.repository=$DOCKER_IMAGE_MOVIE --set movie.image.tag=$DOCKER_TAG --set cast.image.repository=$DOCKER_IMAGE_CAST --set cast.image.tag=$DOCKER_TAG
+                '''
+                }
+            }
+
+        }
+stage('Deploiement en staging'){
+        environment
+        {
+        KUBECONFIG = credentials("config") // we retrieve  kubeconfig from secret file called config saved on jenkins
+        }
+            steps {
+                script {
+                sh '''
+                rm -Rf .kube
+                mkdir .kube
+                ls
+                cat $KUBECONFIG > .kube/config
+                sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" prj/values.yml
+                helm upgrade --install app prj/ --values=prj/values.yaml --namespace staging  --set movie.image.repository=$DOCKER_IMAGE_MOVIE --set movie.image.tag=$DOCKER_TAG --set cast.image.repository=$DOCKER_IMAGE_CAST --set cast.image.tag=$DOCKER_TAG
+                '''
+                }
+            }
+
+        }
+  stage('Deploiement en QA'){
+        environment
+        {
+        KUBECONFIG = credentials("config") // we retrieve  kubeconfig from secret file called config saved on jenkins
+        }
+            steps {
+                script {
+                sh '''
+                rm -Rf .kube
+                mkdir .kube
+                ls
+                cat $KUBECONFIG > .kube/config
+                sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" prj/values.yml
+                helm upgrade --install app prj/ --values=prj/values.yaml --namespace qa  --set movie.image.repository=$DOCKER_IMAGE_MOVIE --set movie.image.tag=$DOCKER_TAG --set cast.image.repository=$DOCKER_IMAGE_CAST --set cast.image.tag=$DOCKER_TAG
+                '''
+                }
+            }
+
+        }
+  stage('Deploiement en prod'){
+        environment
+        {
+        KUBECONFIG = credentials("config") // we retrieve  kubeconfig from secret file called config saved on jenkins
+        }
+            steps {
+            // Create an Approval Button with a timeout of 15minutes.
+            // this require a manuel validation in order to deploy on production environment
+                    timeout(time: 15, unit: "MINUTES") {
+                        input message: 'Do you want to deploy in production ?', ok: 'Yes'
+                    }
+
+                script {
+                sh '''
+                rm -Rf .kube
+                mkdir .kube
+                ls
+                cat $KUBECONFIG > .kube/config
+                sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" prj/values.yml
+                helm upgrade --install app prj/ --values=prj/values.yaml --namespace prod --set movie.image.repository=$DOCKER_IMAGE_MOVIE --set movie.image.tag=$DOCKER_TAG --set cast.image.repository=$DOCKER_IMAGE_CAST --set cast.image.tag=$DOCKER_TAG
+                '''
+                } image: "{{ .Values.cast.containers.image.repository }}:{{ .Values.cast.containers.image.tag }}"
+            }
+
+        }
+
+}
 }

@@ -1,0 +1,41 @@
+the file ~/.docker/cli-plugins/docker-compose 
+should be a symlink to ~/.rd/bin/docker-compose, 
+but points to /Applications/Docker.app/Contents/Resources/cli-plugins/docker-compose.
+
+
+
+he file ~/.docker/cli-plugins/docker-buildx should be a symlink to ~/.rd/bin/docker-buildx,
+but points to /Applications/Docker.app/Contents/Resources/cli-plugins/docker-buildx.
+
+
+ls -la ~/.docker/cli-plugins/
+ docker-buildx -> /Applications/Docker.app/Contents/Resources/cli-plugins/docker-buildx
+ docker-compose -> /Applications/Docker.app/Contents/Resources/cli-plugins/docker-compose
+docker-debug -> /Applications/Docker.app/Contents/Resources/cli-plugins/docker-debug
+docker-dev -> /Applications/Docker.app/Contents/Resources/cli-plugins/docker-dev
+docker-extension -> /Applications/Docker.app/Contents/Resources/cli-plugins/docker-extension
+docker-feedback -> /Applications/Docker.app/Contents/Resources/cli-plugins/docker-feedback
+docker-init -> /Applications/Docker.app/Contents/Resources/cli-plugins/docker-init
+docker-sbom -> /Applications/Docker.app/Contents/Resources/cli-plugins/docker-sbom
+docker-scout -> /Applications/Docker.app/Contents/Resources/cli-plugins/docker-scout
+
+
+
+ls -la  ~/.rd/bin/
+docker -> /Applications/Rancher Desktop.app/Contents/Resources/resources/darwin/bin/docker
+ docker-buildx -> /Applications/Rancher Desktop.app/Contents/Resources/resources/darwin/bin/docker-buildx
+ docker-compose -> /Applications/Rancher Desktop.app/Contents/Resources/resources/darwin/bin/docker-compose
+docker-credential-ecr-login -> /Applications/Rancher Desktop.app/Contents/Resources/resources/darwin/bin/docker-credential-ecr-login
+docker-credential-none -> /Applications/Rancher Desktop.app/Contents/Resources/resources/darwin/bin/docker-credential-none
+docker-credential-osxkeychain -> /Applications/Rancher Desktop.app/Contents/Resources/resources/darwin/bin/docker-credential-osxkeychain
+helm -> /Applications/Rancher Desktop.app/Contents/Resources/resources/darwin/bin/helm
+kubectl -> /Applications/Rancher Desktop.app/Contents/Resources/resources/darwin/bin/kubectl
+kuberlr -> /Applications/Rancher Desktop.app/Contents/Resources/resources/darwin/bin/kuberlr
+nerdctl -> /Applications/Rancher Desktop.app/Contents/Resources/resources/darwin/bin/nerdctl
+rdctl -> /Applications/Rancher Desktop.app/Contents/Resources/resources/darwin/bin/rdctl
+
+
+mv ~/.docker/cli-plugins/docker-buildx ~/.docker/cli-plugins/docker-buildx_bak
+rm ~/.docker/cli-plugins/docker-compose
+ln -s ~/.rd/bin/docker-compose ~/.docker/cli-plugins/docker-compose
+ln -s ~/.rd/bin/docker-buildx ~/.docker/cli-plugins/docker-buildx

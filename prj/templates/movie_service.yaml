@@ -41,7 +41,7 @@ spec:
           value: http://cast_service:8000/api/v1/casts/
         - name: DATABASE_URI
           value: postgresql://movie_db_username:movie_db_password@movie_db/movie_db_dev
-        image: lmalta3/movie-service:v1
+        image:  "{{ .Values.movie.image.repository }}:{{ .Values.movie.image.tag }}"  
         imagePullPolicy: "Always"
         name: movie-service
         ports:

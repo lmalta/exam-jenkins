@@ -72,8 +72,6 @@ stage('Deploiement en dev'){
                 mkdir .kube
                 ls
                 cat $KUBECONFIG > .kube/config
-   //             cp fastapi/values.yaml values.yml
-   //             cat values.yml
                 sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" prj/values.yml
                 helm upgrade --install app prj/ --values=prj/values.yaml --namespace dev  --set movie.image.repository=$DOCKER_IMAGE_MOVIE --set movie.image.tag=$DOCKER_TAG --set cast.image.repository=$DOCKER_IMAGE_CAST --set cast.image.tag=$DOCKER_TAG
                 '''

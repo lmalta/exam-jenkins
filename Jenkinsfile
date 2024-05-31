@@ -140,7 +140,7 @@ stage('Deploiement en staging'){
                 sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" prj/values.yml
                 helm upgrade --install app prj/ --values=prj/values.yaml --namespace prod --set movie.image.repository=$DOCKER_IMAGE_MOVIE --set movie.image.tag=$DOCKER_TAG --set cast.image.repository=$DOCKER_IMAGE_CAST --set cast.image.tag=$DOCKER_TAG
                 '''
-                } image: "{{ .Values.cast.containers.image.repository }}:{{ .Values.cast.containers.image.tag }}"
+                } 
             }
 
         }

@@ -11,9 +11,9 @@ stages {
             steps {
                 script {
                 sh '''
-                 docker rm -f jenkins
-                 docker build -t $DOCKER_ID/$DOCKER_IMAGE_CAST:$DOCKER_TAG cast-service/
-                 docker build -t $DOCKER_ID/$DOCKER_IMAGE_MOVIE:$DOCKER_TAG movie-service/
+                 /Applications/Docker.app/Contents/Resources/bin/docker rm -f jenkins
+                 /Applications/Docker.app/Contents/Resources/bin/docker build -t $DOCKER_ID/$DOCKER_IMAGE_CAST:$DOCKER_TAG cast-service/
+                 /Applications/Docker.app/Contents/Resources/bin/docker build -t $DOCKER_ID/$DOCKER_IMAGE_MOVIE:$DOCKER_TAG movie-service/
                 sleep 6
                 '''
                 }
